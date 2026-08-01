@@ -4,6 +4,7 @@
 -- Internal stuff --
 require("hyprland.lib")
 require("hyprland.services")
+require("hyprland-gui")
 
 -- Environment variables --
 require("hyprland.env")
