@@ -2,10 +2,14 @@
 
 -- Settings
 hl.config({
+    cursor = {
+        no_warps = true,
+    },
     decoration = {
         blur = {
             size = 4,
         },
+        dim_strength = 0.15,
     },
 })
 
