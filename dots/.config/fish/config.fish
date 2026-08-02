@@ -30,4 +30,5 @@ if status is-interactive
     if test "$TERM" = "xterm-kitty"
         alias ssh 'kitten ssh'
     end
+    fish_add_path /home/julian/Apps/VSCode-linux-x64/bin
 end
