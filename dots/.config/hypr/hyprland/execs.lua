@@ -22,4 +22,8 @@ hl.on("hyprland.start", function ()
 
     -- Cursor
     hl.exec_cmd("hyprctl setcursor Bibata-Modern-Classic 24")
+
+    -- Screen Share and Streaming Services
+    hl.exec_cmd("external-display")
+    hl.exec_cmd("sunshine")
 end)
