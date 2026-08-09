@@ -2,6 +2,7 @@ import qs
 import qs.services
 import qs.modules.common
 import qs.modules.common.widgets
+import Qt5Compat.GraphicalEffects
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -196,7 +197,6 @@ Scope {
             implicitWidth: (root.clipboardType === "image" ? 80 : 180)
                            + 112 // Dynamic layout width calculation
 
-
             implicitHeight: 48 // Lowered outer pill height (borderless)
             radius: 20 // Lowered outer capsule rounded corners
             color: m3Colors.surface_container
@@ -241,7 +241,7 @@ Scope {
                 radius: 12 // Lowered rounded corners
                 color: m3Colors.primary_container // Accent orange background
                 border.color: m3Colors.surface_container
-                border.width: 2
+                border.width: 3 // Thicker border (3px)
                 clip: true
 
                 anchors {
@@ -276,8 +276,7 @@ Scope {
                 radius: 12 // Lowered rounded corners
                 color: m3Colors.background
                 border.color: m3Colors.surface_container
-                border.width: 2
-                clip: true
+                border.width: 3 // Thicker border (3px)
 
                 anchors {
                     left: parent.left
@@ -286,13 +285,30 @@ Scope {
                     bottomMargin: 0
                 }
 
-                Image {
+                // Inner container to cleanly clip the image to the border boundary using OpacityMask
+                Rectangle {
+                    id: imageInnerContainer
                     anchors.fill: parent
-                    anchors.margins: 1
-                    source: root.imageSource
-                    fillMode: Image.PreserveAspectCrop // Aspect crop for beautiful thumbnail look
-                    cache: false
-                    asynchronous: true
+                    anchors.margins: parent.border.width
+                    radius: parent.radius - parent.border.width
+                    clip: true
+
+                    layer.enabled: true
+                    layer.effect: OpacityMask {
+                        maskSource: Rectangle {
+                            width: imageInnerContainer.width
+                            height: imageInnerContainer.height
+                            radius: imageInnerContainer.radius
+                        }
+                    }
+
+                    Image {
+                        anchors.fill: parent
+                        source: root.imageSource
+                        fillMode: Image.PreserveAspectCrop // Aspect crop for beautiful thumbnail look
+                        cache: false
+                        asynchronous: true
+                    }
                 }
             }
 
