@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Google Sheets
+Comment=Create and edit spreadsheets online
+Exec=/home/julian/.local/bin/office-web-wrapper --type spreadsheet %f
+Icon=sheets
+Terminal=false
+Categories=Office;
+MimeType=application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;application/vnd.ms-excel;
+StartupNotify=true

@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Google Translate
+Comment=Open Google Translate in App Mode
+Exec=/home/julian/.local/bin/google-apps-wrapper translate
+Icon=google-translate
+Terminal=false
+Categories=Utility;
+StartupNotify=true

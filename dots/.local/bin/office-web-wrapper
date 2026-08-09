@@ -1,0 +1,239 @@
+#!/usr/bin/env bash
+
+# Helper to send desktop notifications for critical errors
+notify_error() {
+  local msg="$1"
+  if command -v notify-send >/dev/null 2>&1; then
+    notify-send "Office Web App" "$msg" --icon=dialog-error
+  fi
+  echo "Error: $msg" >&2
+}
+
+notify_info() {
+  # Completely silent, as requested
+  true
+}
+
+# Advanced argument parsing
+TYPE=""
+FILEPATH=""
+
+if [ "$1" == "--type" ]; then
+  TYPE="$2"
+  FILEPATH="$3"
+else
+  FILEPATH="$1"
+fi
+
+# Detect Chromium-based browser for --app mode
+BROWSER=""
+for cmd in google-chrome microsoft-edge brave-browser brave vivaldi chromium chromium-browser; do
+  if command -v "$cmd" >/dev/null 2>&1; then
+    BROWSER="$cmd"
+    break
+  fi
+done
+
+if [ -z "$BROWSER" ] && command -v xdg-open >/dev/null 2>&1; then
+  BROWSER="xdg-open"
+fi
+
+# CASE 1: No file path provided (launched from app menu)
+if [ -z "$FILEPATH" ]; then
+  case "$TYPE" in
+    document)
+      URL="https://docs.google.com/document/"
+      ;;
+    spreadsheet)
+      URL="https://docs.google.com/spreadsheets/"
+      ;;
+    presentation)
+      URL="https://docs.google.com/presentation/"
+      ;;
+    drive)
+      URL="https://drive.google.com/"
+      ;;
+    *)
+      URL="https://drive.google.com/"
+      ;;
+  esac
+
+  if [ "$BROWSER" = "xdg-open" ]; then
+    nohup xdg-open "$URL" >/dev/null 2>&1 &
+    disown
+  else
+    nohup "$BROWSER" --app="$URL" >/dev/null 2>&1 &
+    disown
+  fi
+  exit 0
+fi
+
+# CASE 2: File path provided (opened via file manager or CLI)
+FILEPATH=$(realpath "$FILEPATH")
+if [ ! -f "$FILEPATH" ]; then
+  notify_error "File '$FILEPATH' does not exist."
+  exit 1
+fi
+
+FILENAME=$(basename "$FILEPATH")
+EXT="${FILENAME##*.}"
+EXT=$(echo "$EXT" | tr '[:upper:]' '[:lower:]')
+
+# Auto-detect type if not specified
+if [ -z "$TYPE" ]; then
+  case "$EXT" in
+    docx|doc) TYPE="document" ;;
+    xlsx|xls) TYPE="spreadsheet" ;;
+    pptx|ppt) TYPE="presentation" ;;
+    *) TYPE="document" ;;
+  esac
+fi
+
+# Check if file is already inside the local Google Drive mount
+GOOGLE_DRIVE_MOUNT="/home/julian/GoogleDrive"
+is_already_in_gdrive=false
+
+if [[ "$FILEPATH" == "$GOOGLE_DRIVE_MOUNT/"* ]]; then
+  is_already_in_gdrive=true
+fi
+
+# Check configured remotes
+use_onedrive=false
+use_gdrive=false
+
+if rclone listremotes 2>/dev/null | grep -q "^onedrive:"; then
+  use_onedrive=true
+elif rclone listremotes 2>/dev/null | grep -q "^gdrive:"; then
+  use_gdrive=true
+fi
+
+# FLOW A: Microsoft OneDrive (fallback if user configured it)
+if [ "$use_onedrive" = true ] && [ "$is_already_in_gdrive" = false ]; then
+  notify_info "Uploading '$FILENAME' to OneDrive..."
+  rclone copyto "$FILEPATH" "onedrive:Documentos/Cargados/$FILENAME" 2>/tmp/rclone_err.log
+  
+  if [ $? -eq 0 ]; then
+    URL=$(rclone link --onedrive-link-type edit "onedrive:Documentos/Cargados/$FILENAME" 2>/dev/null)
+    
+    if [ -n "$URL" ]; then
+      nohup bash "$HOME/.local/share/visum/scripts/visum-sync.sh" "onedrive:Documentos/Cargados/$FILENAME" "$FILEPATH" >/dev/null 2>&1 &
+      disown
+      
+      if [ "$BROWSER" = "xdg-open" ]; then
+        nohup xdg-open "$URL" >/dev/null 2>&1 &
+        disown
+      else
+        nohup "$BROWSER" --app="$URL" >/dev/null 2>&1 &
+        disown
+      fi
+      
+      exit 0
+    else
+      notify_error "Failed to generate OneDrive link. Falling back to local Visum."
+    fi
+  else
+    ERR_MSG=$(cat /tmp/rclone_err.log)
+    notify_error "OneDrive upload failed: $ERR_MSG. Falling back to local Visum."
+  fi
+
+# FLOW B: Google Drive (primary cloud flow)
+elif [ "$use_gdrive" = true ] || [ "$is_already_in_gdrive" = true ]; then
+  URL=""
+  success=false
+
+  if [ "$is_already_in_gdrive" = true ]; then
+    REL_PATH=${FILEPATH#"$GOOGLE_DRIVE_MOUNT/"}
+    URL=$(rclone link "gdrive:$REL_PATH" 2>/dev/null)
+    if [ -n "$URL" ]; then
+      success=true
+    else
+      notify_error "Failed to get sharing link for local Google Drive file: $REL_PATH. Falling back to upload."
+    fi
+  fi
+
+  if [ "$success" = false ]; then
+    notify_info "Uploading '$FILENAME' to Google Drive..."
+    rclone copyto "$FILEPATH" "gdrive:Documentos/Cargados/$FILENAME" 2>/tmp/rclone_err.log
+    if [ $? -eq 0 ]; then
+      URL=$(rclone link "gdrive:Documentos/Cargados/$FILENAME" 2>/dev/null)
+      if [ -n "$URL" ]; then
+        success=true
+      fi
+    fi
+  fi
+
+  if [ "$success" = true ] && [ -n "$URL" ]; then
+    FILE_ID=""
+    if [[ "$URL" == *"/file/d/"* ]]; then
+      FILE_ID=$(echo "$URL" | sed -n 's|.*/file/d/\([^/]*\).*|\1|p')
+    elif [[ "$URL" == *"id="* ]]; then
+      FILE_ID=$(echo "$URL" | sed -n 's|.*id=\([^&]*\).*|\1|p')
+    fi
+    
+    if [ -n "$FILE_ID" ]; then
+      EDIT_URL=""
+      case "$TYPE" in
+        document)
+          EDIT_URL="https://docs.google.com/document/d/${FILE_ID}/edit"
+          ;;
+        spreadsheet)
+          EDIT_URL="https://docs.google.com/spreadsheets/d/${FILE_ID}/edit"
+          ;;
+        presentation)
+          EDIT_URL="https://docs.google.com/presentation/d/${FILE_ID}/edit"
+          ;;
+        *)
+          EDIT_URL="$URL"
+          ;;
+      esac
+      
+      if [ "$is_already_in_gdrive" = false ]; then
+        nohup bash "$HOME/.local/share/visum/scripts/visum-sync.sh" "gdrive:Documentos/Cargados/$FILENAME" "$FILEPATH" >/dev/null 2>&1 &
+        disown
+      fi
+      
+      if [ "$BROWSER" = "xdg-open" ]; then
+        nohup xdg-open "$EDIT_URL" >/dev/null 2>&1 &
+        disown
+      else
+        nohup "$BROWSER" --app="$EDIT_URL" >/dev/null 2>&1 &
+        disown
+      fi
+      
+      exit 0
+    else
+      notify_error "Failed to parse Google Drive link. Falling back to local Visum."
+    fi
+  else
+    ERR_MSG=$(cat /tmp/rclone_err.log 2>/dev/null)
+    notify_error "Google Drive sync/upload failed: ${ERR_MSG:-"Unknown error"}. Falling back to local Visum."
+  fi
+fi
+
+# FLOW C: Fallback to Local Visum Server (View-only)
+notify_info "Starting local Visum server..."
+ERR_LOG=$(mktemp)
+URL=$(bash "$HOME/.local/share/visum/scripts/visum.sh" "$FILEPATH" 2>"$ERR_LOG")
+STATUS=$?
+
+if [ $STATUS -ne 0 ] || [ -z "$URL" ]; then
+  ERR_MSG=$(cat "$ERR_LOG" 2>/dev/null)
+  rm -f "$ERR_LOG"
+  if [ -z "$ERR_MSG" ]; then
+    ERR_MSG="Failed to process file with Visum."
+  fi
+  notify_error "$ERR_MSG"
+  exit 1
+fi
+
+rm -f "$ERR_LOG"
+
+if [ "$BROWSER" = "xdg-open" ]; then
+  nohup xdg-open "$URL" >/dev/null 2>&1 &
+  disown
+else
+  nohup "$BROWSER" --app="$URL" >/dev/null 2>&1 &
+  disown
+fi
+
+exit 0

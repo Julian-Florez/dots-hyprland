@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=NotebookLM
+Comment=Open NotebookLM in App Mode
+Exec=/home/julian/.local/bin/google-apps-wrapper notebooklm
+Icon=notebook
+Terminal=false
+Categories=Office;Utility;
+StartupNotify=true

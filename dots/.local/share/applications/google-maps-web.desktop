@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Google Maps
+Comment=Open Google Maps in App Mode
+Exec=/home/julian/.local/bin/google-apps-wrapper maps
+Icon=google-maps
+Terminal=false
+Categories=Utility;Map;
+StartupNotify=true

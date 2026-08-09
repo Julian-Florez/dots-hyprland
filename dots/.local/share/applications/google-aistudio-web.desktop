@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Google AI Studio
+Comment=Open Google AI Studio in App Mode
+Exec=/home/julian/.local/bin/google-apps-wrapper aistudio
+Icon=system-run
+Terminal=false
+Categories=Development;
+StartupNotify=true

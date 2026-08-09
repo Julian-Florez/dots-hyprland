@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+
+# Helper to send desktop notifications for critical errors
+notify_error() {
+  local msg="$1"
+  if command -v notify-send >/dev/null 2>&1; then
+    notify-send "Google Apps Launcher" "$msg" --icon=dialog-error
+  fi
+  echo "Error: $msg" >&2
+}
+
+APP="$1"
+if [ -z "$APP" ]; then
+  notify_error "No application specified."
+  exit 1
+fi
+
+# Resolve URL
+URL=""
+case "$APP" in
+  gmail)
+    URL="https://mail.google.com/"
+    ;;
+  youtube)
+    URL="https://www.youtube.com/"
+    ;;
+  gemini)
+    URL="https://gemini.google.com/"
+    ;;
+  maps)
+    URL="https://www.google.com/maps/"
+    ;;
+  calendar)
+    URL="https://calendar.google.com/"
+    ;;
+  photos)
+    URL="https://photos.google.com/"
+    ;;
+  translate)
+    URL="https://translate.google.com/"
+    ;;
+  tasks)
+    URL="https://tasks.google.com/"
+    ;;
+  notebooklm)
+    URL="https://notebooklm.google.com/"
+    ;;
+  aistudio)
+    URL="https://aistudio.google.com/"
+    ;;
+  *)
+    notify_error "Unknown application: $APP"
+    exit 1
+    ;;
+esac
+
+# Detect Chromium-based browser for --app mode
+BROWSER=""
+for cmd in google-chrome microsoft-edge brave-browser brave vivaldi chromium chromium-browser; do
+  if command -v "$cmd" >/dev/null 2>&1; then
+    BROWSER="$cmd"
+    break
+  fi
+done
+
+if [ -z "$BROWSER" ] && command -v xdg-open >/dev/null 2>&1; then
+  BROWSER="xdg-open"
+fi
+
+if [ -z "$BROWSER" ]; then
+  notify_error "No suitable browser found."
+  exit 1
+fi
+
+# Launch browser in app mode
+if [ "$BROWSER" = "xdg-open" ]; then
+  nohup xdg-open "$URL" >/dev/null 2>&1 &
+  disown
+else
+  nohup "$BROWSER" --app="$URL" >/dev/null 2>&1 &
+  disown
+fi
+
+exit 0

@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Gmail
+Comment=Open Google Gmail in App Mode
+Exec=/home/julian/.local/bin/google-apps-wrapper gmail
+Icon=gmail
+Terminal=false
+Categories=Office;Network;Email;
+StartupNotify=true

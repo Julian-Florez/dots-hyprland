@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Gemini
+Comment=Open Google Gemini AI in App Mode
+Exec=/home/julian/.local/bin/google-apps-wrapper gemini
+Icon=gemini
+Terminal=false
+Categories=Utility;Development;
+StartupNotify=true

@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Google Photos
+Comment=Open Google Photos in App Mode
+Exec=/home/julian/.local/bin/google-apps-wrapper photos
+Icon=google-photos
+Terminal=false
+Categories=Graphics;Photography;Viewer;
+StartupNotify=true

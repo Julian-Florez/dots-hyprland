@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "Visum Loading Screen Clean",
+  "version": "1.0",
+  "description": "Removes text from Google Docs and Microsoft Office Online loading screens, keeping only the animation.",
+  "content_scripts": [
+    {
+      "matches": [
+        "https://docs.google.com/document/d/*/edit*",
+        "https://docs.google.com/spreadsheets/d/*/edit*",
+        "https://docs.google.com/presentation/d/*/edit*",
+        "http://view.officeapps.live.com/op/view.aspx*",
+        "https://view.officeapps.live.com/op/view.aspx*"
+      ],
+      "css": ["clean-loading.css"],
+      "run_at": "document_start"
+    }
+  ]
+}

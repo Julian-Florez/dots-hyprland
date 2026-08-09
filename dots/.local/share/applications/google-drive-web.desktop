@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Google Drive
+Comment=Access your cloud files
+Exec=/home/julian/.local/bin/office-web-wrapper --type drive
+Icon=google-drive
+Terminal=false
+Categories=Office;
+StartupNotify=true

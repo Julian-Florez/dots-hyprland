@@ -1,0 +1,24 @@
+/* Google Docs loading screen text selectors */
+#docs-loading-text,
+.docs-homescreen-loading-text,
+.docs-homescreen-loading-message,
+.docs-homescreen-loading-status,
+.docs-homescreen-loading-subtext,
+#docs-homescreen-loading-message,
+#docs-homescreen-loading-status,
+#docs-homescreen-loading-subtext,
+#docs-homescreen-loading-subtext2 {
+    display: none !important;
+}
+
+/* Microsoft Office Online loading screen text selectors */
+#LoadingText,
+.wac-loading-text,
+#WacLoadingText,
+.wac-loading-msg,
+#loadingText,
+.loadingText,
+.loading-message,
+.loading-status {
+    display: none !important;
+}

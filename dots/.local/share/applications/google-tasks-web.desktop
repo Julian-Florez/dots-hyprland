@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Google Tasks
+Comment=Open Google Tasks in App Mode
+Exec=/home/julian/.local/bin/google-apps-wrapper tasks
+Icon=google-tasks-desktop
+Terminal=false
+Categories=Office;Utility;
+StartupNotify=true

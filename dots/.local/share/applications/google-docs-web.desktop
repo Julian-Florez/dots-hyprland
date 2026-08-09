@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Google Docs
+Comment=Create and edit documents online
+Exec=/home/julian/.local/bin/office-web-wrapper --type document %f
+Icon=google-docs
+Terminal=false
+Categories=Office;
+MimeType=application/vnd.openxmlformats-officedocument.wordprocessingml.document;application/msword;
+StartupNotify=true
