@@ -1,11 +1,13 @@
 [Desktop Entry]
 Version=1.0
 Type=Application
-Name=Google Slides
+Name=Presentaciones
 Comment=Create and edit presentations online
 Exec=/home/julian/.local/bin/office-web-wrapper --type presentation %f
+Keywords=powerpoint;google;office;slides
 Icon=google-slides
 Terminal=false
 Categories=Office;
 MimeType=application/vnd.openxmlformats-officedocument.presentationml.presentation;application/vnd.ms-powerpoint;
 StartupNotify=true
+StartupWMClass=chrome-docs.google.com__presentation_-Default

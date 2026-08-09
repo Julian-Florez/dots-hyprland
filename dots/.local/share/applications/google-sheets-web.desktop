@@ -1,11 +1,13 @@
 [Desktop Entry]
 Version=1.0
 Type=Application
-Name=Google Sheets
+Name=Hojas de Calculo
 Comment=Create and edit spreadsheets online
 Exec=/home/julian/.local/bin/office-web-wrapper --type spreadsheet %f
-Icon=sheets
+Keywords=excel;sheet;sheets;google;office
+Icon=google-sheets
 Terminal=false
 Categories=Office;
 MimeType=application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;application/vnd.ms-excel;
 StartupNotify=true
+StartupWMClass=chrome-docs.google.com__spreadsheets_-Default

@@ -8,3 +8,4 @@ Icon=google-drive
 Terminal=false
 Categories=Office;
 StartupNotify=true
+StartupWMClass=chrome-drive.google.com__-Default
