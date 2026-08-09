@@ -8,3 +8,4 @@ Icon=youtube
 Terminal=false
 Categories=AudioVideo;Video;Player;
 StartupNotify=true
+StartupWMClass=chrome-www.youtube.com__-Default

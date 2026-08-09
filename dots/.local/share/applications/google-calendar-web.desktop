@@ -8,3 +8,4 @@ Icon=google-agenda
 Terminal=false
 Categories=Office;Calendar;
 StartupNotify=true
+StartupWMClass=chrome-calendar.google.com__-Default

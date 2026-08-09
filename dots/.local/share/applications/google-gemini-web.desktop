@@ -8,3 +8,4 @@ Icon=gemini
 Terminal=false
 Categories=Utility;Development;
 StartupNotify=true
+StartupWMClass=chrome-gemini.google.com__-Default

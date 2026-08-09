@@ -8,3 +8,4 @@ Icon=gmail
 Terminal=false
 Categories=Office;Network;Email;
 StartupNotify=true
+StartupWMClass=chrome-mail.google.com__-Default

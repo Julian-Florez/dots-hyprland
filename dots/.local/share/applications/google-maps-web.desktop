@@ -8,3 +8,4 @@ Icon=google-maps
 Terminal=false
 Categories=Utility;Map;
 StartupNotify=true
+StartupWMClass=chrome-www.google.com__maps_-Default

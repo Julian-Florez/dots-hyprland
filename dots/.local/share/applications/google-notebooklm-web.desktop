@@ -8,3 +8,4 @@ Icon=notebook
 Terminal=false
 Categories=Office;Utility;
 StartupNotify=true
+StartupWMClass=chrome-notebooklm.google.com__-Default

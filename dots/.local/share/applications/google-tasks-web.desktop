@@ -8,3 +8,4 @@ Icon=google-tasks-desktop
 Terminal=false
 Categories=Office;Utility;
 StartupNotify=true
+StartupWMClass=chrome-tasks.google.com__-Default

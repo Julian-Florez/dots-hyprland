@@ -8,3 +8,4 @@ Icon=system-run
 Terminal=false
 Categories=Development;
 StartupNotify=true
+StartupWMClass=chrome-aistudio.google.com__-Default

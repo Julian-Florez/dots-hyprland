@@ -8,3 +8,4 @@ Icon=google-photos
 Terminal=false
 Categories=Graphics;Photography;Viewer;
 StartupNotify=true
+StartupWMClass=chrome-photos.google.com__-Default
