@@ -1,7 +1,7 @@
 [Desktop Entry]
 Version=1.0
 Type=Application
-Name=Documentos (Word, Docs, Office)
+Name=Documentos
 Comment=Create and edit documents online (word, docs, office)
 Exec=/home/julian/.local/bin/office-web-wrapper --type document %f
 Keywords=word;google;office;docs;

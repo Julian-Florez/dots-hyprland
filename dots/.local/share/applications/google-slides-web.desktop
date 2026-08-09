@@ -1,7 +1,7 @@
 [Desktop Entry]
 Version=1.0
 Type=Application
-Name=Presentaciones (PowerPoint, Slides, Office)
+Name=Presentaciones
 Comment=Create and edit presentations online (powerpoint, slides, office)
 Exec=/home/julian/.local/bin/office-web-wrapper --type presentation %f
 Keywords=powerpoint;google;office;slides;

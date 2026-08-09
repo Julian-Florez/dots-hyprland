@@ -1,7 +1,7 @@
 [Desktop Entry]
 Version=1.0
 Type=Application
-Name=Hojas de Calculo (Excel, Sheets, Office)
+Name=Hojas de Calculo
 Comment=Create and edit spreadsheets online (excel, sheet, sheets, office)
 Exec=/home/julian/.local/bin/office-web-wrapper --type spreadsheet %f
 Keywords=excel;sheet;sheets;google;office;
