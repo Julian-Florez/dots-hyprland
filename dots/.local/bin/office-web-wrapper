@@ -18,33 +18,48 @@ notify_info() {
 setup_dynamic_icon() {
   local type="$1"
   local file_id="$2"
-  local icon_dir="/home/julian/.local/share/Ozone-icons/Vector/scalable/apps"
+  local app_dir="/home/julian/.local/share/applications"
   
-  if [ -d "$icon_dir" ] && [ -n "$file_id" ]; then
+  if [ -d "$app_dir" ] && [ -n "$file_id" ]; then
     local target_icon=""
     local class_name=""
+    local app_name=""
     
     case "$type" in
       document)
-        target_icon="google-docs.svg"
+        target_icon="google-docs"
         class_name="chrome-docs.google.com__document_d_${file_id}_edit-Default"
+        app_name="Documentos"
         ;;
       spreadsheet)
-        target_icon="google-sheets.svg"
+        target_icon="google-sheets"
         class_name="chrome-docs.google.com__spreadsheets_d_${file_id}_edit-Default"
+        app_name="Hojas de Calculo"
         ;;
       presentation)
-        target_icon="google-slides.svg"
+        target_icon="google-slides"
         class_name="chrome-docs.google.com__presentation_d_${file_id}_edit-Default"
+        app_name="Presentaciones"
         ;;
     esac
     
     if [ -n "$target_icon" ] && [ -n "$class_name" ]; then
-      # Clean up older dynamic icon symlinks (> 7 days) to prevent folder clutter
-      find "$icon_dir" -name "chrome-*" -type l -mtime +7 -delete 2>/dev/null || true
+      # Clean up older temporary launcher files (> 3 days) to prevent clutter
+      find "$app_dir" -name "chrome-*.desktop" -mtime +3 -delete 2>/dev/null || true
       
-      # Create new symlink associating window class with Google icon
-      ln -sf "$icon_dir/$target_icon" "$icon_dir/${class_name}.svg"
+      # Create new temporary .desktop file
+      cat <<EOF > "$app_dir/${class_name}.desktop"
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=${app_name} (Web)
+Icon=${target_icon}
+Exec=/home/julian/.local/bin/office-web-wrapper --type ${type}
+Terminal=false
+Categories=Office;
+NoDisplay=true
+StartupWMClass=${class_name}
+EOF
     fi
   fi
 }
