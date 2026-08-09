@@ -14,6 +14,41 @@ notify_info() {
   true
 }
 
+# Helper to dynamically link unique Chrome window classes to their respective icons
+setup_dynamic_icon() {
+  local type="$1"
+  local file_id="$2"
+  local icon_dir="/home/julian/.local/share/Ozone-icons/Vector/scalable/apps"
+  
+  if [ -d "$icon_dir" ] && [ -n "$file_id" ]; then
+    local target_icon=""
+    local class_name=""
+    
+    case "$type" in
+      document)
+        target_icon="google-docs.svg"
+        class_name="chrome-docs.google.com__document_d_${file_id}_edit-Default"
+        ;;
+      spreadsheet)
+        target_icon="google-sheets.svg"
+        class_name="chrome-docs.google.com__spreadsheets_d_${file_id}_edit-Default"
+        ;;
+      presentation)
+        target_icon="google-slides.svg"
+        class_name="chrome-docs.google.com__presentation_d_${file_id}_edit-Default"
+        ;;
+    esac
+    
+    if [ -n "$target_icon" ] && [ -n "$class_name" ]; then
+      # Clean up older dynamic icon symlinks (> 7 days) to prevent folder clutter
+      find "$icon_dir" -name "chrome-*" -type l -mtime +7 -delete 2>/dev/null || true
+      
+      # Create new symlink associating window class with Google icon
+      ln -sf "$icon_dir/$target_icon" "$icon_dir/${class_name}.svg"
+    fi
+  fi
+}
+
 # Advanced argument parsing
 TYPE=""
 FILEPATH=""
@@ -186,6 +221,9 @@ elif [ "$use_gdrive" = true ] || [ "$is_already_in_gdrive" = true ]; then
           EDIT_URL="$URL"
           ;;
       esac
+      
+      # Configure dynamic window class icon mapping
+      setup_dynamic_icon "$TYPE" "$FILE_ID"
       
       if [ "$is_already_in_gdrive" = false ]; then
         nohup bash "$HOME/.local/share/visum/scripts/visum-sync.sh" "gdrive:Documentos/Cargados/$FILENAME" "$FILEPATH" >/dev/null 2>&1 &
