@@ -3,5 +3,4 @@ import QtQuick
 
 AndroidQuickToggleButton {
     toggleModel: WifiHotspotToggle {}
-    roleName: "wifiHotspot"
 }
