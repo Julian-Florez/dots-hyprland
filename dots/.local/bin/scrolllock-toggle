@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-sleep 0.05
+sleep 0.15
 state="false"
 for f in /sys/class/leds/*::scrolllock/brightness; do
     if [ -f "$f" ] && [ "$(cat "$f")" -ne 0 ]; then
