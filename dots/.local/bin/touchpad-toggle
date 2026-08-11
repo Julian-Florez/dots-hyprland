@@ -10,12 +10,28 @@ if [ -z "$device" ]; then
     echo "No touchpad device found!"
     exit 1
 fi
+
 state_file="/tmp/qs_touchpad_state"
-if [ -f "$state_file" ] && [ "$(cat "$state_file")" = "false" ]; then
-    new_state="true"
-else
-    new_state="false"
+current_state="true"
+if [ -f "$state_file" ]; then
+    current_state=$(cat "$state_file")
 fi
+
+# Parse argument
+arg="$1"
+if [ "$arg" = "on" ]; then
+    new_state="true"
+elif [ "$arg" = "off" ]; then
+    new_state="false"
+else
+    # Toggle
+    if [ "$current_state" = "false" ]; then
+        new_state="true"
+    else
+        new_state="false"
+    fi
+fi
+
 echo "$new_state" > "$state_file"
 echo "Setting touchpad $device to $new_state"
 
