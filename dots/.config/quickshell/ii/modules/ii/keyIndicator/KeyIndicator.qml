@@ -169,7 +169,6 @@ Scope {
 
         anchors {
             right: true
-            verticalCenter: true
         }
 
         margins {
