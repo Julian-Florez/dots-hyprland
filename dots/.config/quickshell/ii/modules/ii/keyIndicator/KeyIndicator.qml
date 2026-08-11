@@ -142,103 +142,103 @@ Scope {
     IpcHandler {
         target: "keyIndicator"
 
-        function showIndicator(name, state) {
-            root.showIndicator(name, state);
-        }
+        function showIndicator(name: string, state: string): void {
+        root.showIndicator(name, state);
+    }
     }
 
-    // Listen directly to internal Notifications DND (silent) state changes
-    Connections {
-        target: Notifications
-        function onSilentChanged() {
-            root.showIndicator("dnd", Notifications.silent);
-        }
-    }
-
-    PanelWindow {
-        id: indicatorWindow
-
-        // Show window if any indicator is currently visible
-        visible: {
-            for (let i = 0; i < indicatorList.count; i++) {
-                if (indicatorList.get(i).show)
-                    return true;
+        // Listen directly to internal Notifications DND (silent) state changes
+        Connections {
+            target: Notifications
+            function onSilentChanged() {
+                root.showIndicator("dnd", Notifications.silent);
             }
-            return false;
         }
 
-        anchors {
-            right: true
-        }
+        PanelWindow {
+            id: indicatorWindow
 
-        margins {
-            right: 24
-        }
+            // Show window if any indicator is currently visible
+            visible: {
+                for (let i = 0; i < indicatorList.count; i++) {
+                    if (indicatorList.get(i).show)
+                        return true;
+                }
+                return false;
+            }
 
-        exclusionMode: ExclusionMode.Ignore
-        exclusiveZone: 0
-        color: "transparent"
+            anchors {
+                right: true
+            }
 
-        implicitWidth: 80
-        implicitHeight: mainColumn.implicitHeight
+            margins {
+                right: 24
+            }
 
-        screen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name) ?? null
+            exclusionMode: ExclusionMode.Ignore
+            exclusiveZone: 0
+            color: "transparent"
 
-        WlrLayershell.namespace: "quickshell:keyIndicator"
-        WlrLayershell.layer: WlrLayer.Overlay
+            implicitWidth: 80
+            implicitHeight: mainColumn.implicitHeight
 
-        ColumnLayout {
-            id: mainColumn
-            spacing: 8
-            anchors.fill: parent
+            screen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name) ?? null
 
-            Repeater {
-                model: indicatorList
-                delegate: Rectangle {
-                    id: indicatorCard
-                    required property string name
-                    required property string icon
-                    required property string label
-                    required property bool active
-                    required property bool show
+            WlrLayershell.namespace: "quickshell:keyIndicator"
+            WlrLayershell.layer: WlrLayer.Overlay
 
-                    implicitWidth: 56
-                    implicitHeight: 56
-                    radius: 28 // Circle
+            ColumnLayout {
+                id: mainColumn
+                spacing: 8
+                anchors.fill: parent
 
-                    color: active ? m3Colors.primary_container : m3Colors.surface_container
-                    border.color: m3Colors.background
-                    border.width: 3
+                Repeater {
+                    model: indicatorList
+                    delegate: Rectangle {
+                        id: indicatorCard
+                        required property string name
+                        required property string icon
+                        required property string label
+                        required property bool active
+                        required property bool show
 
-                    // Entry/exit animations
-                    opacity: show ? 1.0 : 0.0
-                    scale: show ? 1.0 : 0.8
+                        implicitWidth: 56
+                        implicitHeight: 56
+                        radius: 28 // Circle
 
-                    Behavior on opacity {
-                        NumberAnimation {
-                            duration: 150
+                        color: active ? m3Colors.primary_container : m3Colors.surface_container
+                        border.color: m3Colors.background
+                        border.width: 3
+
+                        // Entry/exit animations
+                        opacity: show ? 1.0 : 0.0
+                        scale: show ? 1.0 : 0.8
+
+                        Behavior on opacity {
+                            NumberAnimation {
+                                duration: 150
+                            }
                         }
-                    }
-                    Behavior on scale {
-                        NumberAnimation {
-                            duration: 150
-                            easing.type: Easing.OutBack
+                        Behavior on scale {
+                            NumberAnimation {
+                                duration: 150
+                                easing.type: Easing.OutBack
+                            }
                         }
-                    }
 
-                    Layout.preferredWidth: show ? 56 : 0
-                    Layout.preferredHeight: show ? 56 : 0
-                    Layout.alignment: Qt.AlignHCenter
-                    visible: opacity > 0.01
+                        Layout.preferredWidth: show ? 56 : 0
+                        Layout.preferredHeight: show ? 56 : 0
+                        Layout.alignment: Qt.AlignHCenter
+                        visible: opacity > 0.01
 
-                    MaterialSymbol {
-                        anchors.centerIn: parent
-                        text: indicatorCard.icon
-                        iconSize: 24
-                        color: indicatorCard.active ? m3Colors.on_primary_container : m3Colors.on_surface
+                        MaterialSymbol {
+                            anchors.centerIn: parent
+                            text: indicatorCard.icon
+                            iconSize: 24
+                            color: indicatorCard.active ? m3Colors.on_primary_container : m3Colors.on_surface
+                        }
                     }
                 }
             }
         }
     }
-}
