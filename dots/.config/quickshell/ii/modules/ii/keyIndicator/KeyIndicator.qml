@@ -104,7 +104,7 @@ Scope {
                 indicatorList.setProperty(i, "active", active);
                 indicatorList.setProperty(i, "icon", icon);
                 indicatorList.setProperty(i, "label", label);
-                indicatorList.setProperty(i, "visible", true);
+                indicatorList.setProperty(i, "show", true);
                 found = true;
                 break;
             }
@@ -116,7 +116,7 @@ Scope {
                                      "icon": icon,
                                      "label": label,
                                      "active": active,
-                                     "visible": true
+                                     "show": true
                                  });
         }
 
@@ -128,7 +128,7 @@ Scope {
             timer.triggered.connect(function () {
                 for (let i = 0; i < indicatorList.count; i++) {
                     if (indicatorList.get(i).name === name) {
-                        indicatorList.setProperty(i, "visible", false);
+                        indicatorList.setProperty(i, "show", false);
                         break;
                     }
                 }
@@ -161,7 +161,7 @@ Scope {
         // Show window if any indicator is currently visible
         visible: {
             for (let i = 0; i < indicatorList.count; i++) {
-                if (indicatorList.get(i).visible)
+                if (indicatorList.get(i).show)
                     return true;
             }
             return false;
@@ -201,7 +201,7 @@ Scope {
                     required property string icon
                     required property string label
                     required property bool active
-                    required property bool visible
+                    required property bool show
 
                     implicitWidth: 56
                     implicitHeight: 56
@@ -212,8 +212,8 @@ Scope {
                     border.width: 3
 
                     // Entry/exit animations
-                    opacity: visible ? 1.0 : 0.0
-                    scale: visible ? 1.0 : 0.8
+                    opacity: show ? 1.0 : 0.0
+                    scale: show ? 1.0 : 0.8
 
                     Behavior on opacity {
                         NumberAnimation {
@@ -227,8 +227,8 @@ Scope {
                         }
                     }
 
-                    Layout.preferredWidth: visible ? 56 : 0
-                    Layout.preferredHeight: visible ? 56 : 0
+                    Layout.preferredWidth: show ? 56 : 0
+                    Layout.preferredHeight: show ? 56 : 0
                     Layout.alignment: Qt.AlignHCenter
                     visible: opacity > 0.01
 
