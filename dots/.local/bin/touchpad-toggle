@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+device=$(hyprctl devices -j | jq -r '.mice[] | select(.name | contains("touchpad")) | .name' | head -n 1)
+if [ -z "$device" ]; then
+    device=$(hyprctl devices | grep -i touchpad | head -n 1 | awk '{print $1}')
+fi
+if [ -z "$device" ]; then
+    exit 1
+fi
+current=$(hyprctl getoption "device:$device:enabled" -j 2>/dev/null | jq -r '.int')
+if [ -z "$current" ] || [ "$current" = "null" ]; then
+    current=$(hyprctl getoption "device:$device:enabled" | grep "int:" | awk '{print $2}')
+fi
+if [ "$current" -eq 1 ]; then
+    new_state="false"
+else
+    new_state="true"
+fi
+hyprctl keyword "device:$device:enabled" "$new_state"
+quickshell -c ii ipc call keyIndicator showIndicator "touchpad" "$new_state"

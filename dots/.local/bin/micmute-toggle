@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle
+status=$(wpctl get-volume @DEFAULT_AUDIO_SOURCE@)
+if echo "$status" | grep -q "MUTED"; then
+    state="true"
+else
+    state="false"
+fi
+quickshell -c ii ipc call keyIndicator showIndicator "micmute" "$state"

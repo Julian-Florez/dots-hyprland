@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+sleep 0.05
+state="false"
+for f in /sys/class/leds/*::scrolllock/brightness; do
+    if [ -f "$f" ] && [ "$(cat "$f")" -ne 0 ]; then
+        state="true"
+        break
+    fi
+done
+quickshell -c ii ipc call keyIndicator showIndicator "scrolllock" "$state"

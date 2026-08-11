@@ -23,6 +23,7 @@ import qs.modules.ii.overlay
 import qs.modules.ii.verticalBar
 import qs.modules.ii.wallpaperSelector
 import qs.modules.ii.clipboardToast
+import qs.modules.ii.keyIndicator
 
 Scope {
     PanelLoader {
@@ -90,5 +91,8 @@ Scope {
     }
     PanelLoader {
         component: ClipboardToast {}
+    }
+    PanelLoader {
+        component: KeyIndicator {}
     }
 }
