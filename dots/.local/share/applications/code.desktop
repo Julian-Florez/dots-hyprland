@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Visual Studio Code
+Comment=Code Editing. Redefined.
+Exec=/home/julian/.local/bin/code %F
+Icon=code
+Type=Application
+Terminal=false
+Categories=Development;TextEditor;Utility;
+StartupWMClass=Code
+MimeType=text/plain;
+StartupNotify=true
