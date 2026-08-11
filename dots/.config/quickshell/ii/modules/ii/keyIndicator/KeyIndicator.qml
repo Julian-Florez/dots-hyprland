@@ -79,7 +79,7 @@ Scope {
             label = "Scroll Lock";
             break;
         case "touchpad":
-            icon = active ? "touchpad" : "touchpad_off";
+            icon = "trackpad_input";
             label = "Touchpad";
             break;
         case "micmute":

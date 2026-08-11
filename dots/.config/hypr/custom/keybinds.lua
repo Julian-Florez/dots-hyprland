@@ -6,5 +6,7 @@ hl.bind("SUPER + F9", hl.dsp.exec_cmd("touchpad-toggle"), { description = "Indic
 hl.bind("SUPER + F4", hl.dsp.exec_cmd("micmute-toggle"), { description = "Indicators: Toggle Mic Mute" })
 hl.bind("Scroll_Lock", hl.dsp.exec_cmd("scrolllock-toggle"), { non_consuming = true, description = "Indicators: ScrollLock" })
 hl.bind("XF86AudioMicMute", hl.dsp.exec_cmd("micmute-toggle"), { locked = true, description = "Indicators: Toggle Mic Mute" })
+hl.bind("XF86TouchpadToggle", hl.dsp.exec_cmd("touchpad-toggle"), { description = "Indicators: Toggle Touchpad" })
+
 
 

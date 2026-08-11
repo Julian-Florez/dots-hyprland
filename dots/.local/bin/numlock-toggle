@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 sleep 0.15
-state=$(hyprctl devices -j | jq -r 'if [.keyboards[].numLock] | any then "true" else "false" end' 2>/dev/null)
+state=$(hyprctl devices -j | jq -r '.keyboards[] | select(.main == true) | .numLock' 2>/dev/null)
 if [ -z "$state" ] || [ "$state" = "null" ]; then
-    state=$(hyprctl keyboards -j | jq -r 'if [.[] | .numLock] | any then "true" else "false" end' 2>/dev/null)
+    state=$(hyprctl keyboards -j | jq -r '.[] | select(.main == true) | .numLock' 2>/dev/null)
 fi
 quickshell -c ii ipc call keyIndicator showIndicator "numlock" "$state"

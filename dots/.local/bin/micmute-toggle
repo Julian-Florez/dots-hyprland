@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle
-status=$(wpctl get-volume @DEFAULT_AUDIO_SOURCE@)
+wpctl set-mute @DEFAULT_SOURCE@ toggle
+status=$(wpctl get-volume @DEFAULT_SOURCE@)
 if echo "$status" | grep -q "MUTED"; then
     state="true"
 else
