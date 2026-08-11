@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Antigravity
+Comment=Antigravity Code Editor and IDE
+Exec=/home/julian/.local/bin/antigravity %F
+Icon=/home/julian/.local/opt/antigravity/antigravity.png
+Type=Application
+Terminal=false
+Categories=Development;TextEditor;
+StartupWMClass=antigravity
+MimeType=text/plain;
+StartupNotify=true

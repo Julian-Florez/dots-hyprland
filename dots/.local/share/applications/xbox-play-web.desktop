@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Xbox Cloud Gaming
+Comment=Play Xbox games on the cloud
+Exec=/home/julian/.local/bin/google-apps-wrapper xbox
+Icon=/home/julian/.icons/extra/xbox.svg
+Terminal=false
+Categories=Game;
+StartupNotify=true
+StartupWMClass=chrome-www.xbox.com__es-ES_play_-Default
