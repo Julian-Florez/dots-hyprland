@@ -38,7 +38,7 @@ Scope {
 
     Timer {
         id: osdTimeout
-        interval: 5000
+        interval: 2000
         repeat: false
         running: false
         onTriggered: {
