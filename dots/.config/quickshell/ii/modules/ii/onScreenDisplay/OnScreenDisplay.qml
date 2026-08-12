@@ -110,8 +110,7 @@ Scope {
             WlrLayershell.namespace: "quickshell:onScreenDisplay"
             WlrLayershell.layer: WlrLayer.Overlay
             anchors {
-                top: !Config.options.bar.bottom
-                bottom: Config.options.bar.bottom
+                right: true
             }
             mask: Region {
                 item: osdValuesWrapper
@@ -120,8 +119,7 @@ Scope {
             exclusionMode: ExclusionMode.Ignore
             exclusiveZone: 0
             margins {
-                top: Appearance.sizes.barHeight
-                bottom: Appearance.sizes.barHeight
+                right: 20
             }
 
             implicitWidth: columnLayout.implicitWidth
@@ -142,7 +140,8 @@ Scope {
                     MouseArea {
                         anchors.fill: parent
                         hoverEnabled: true
-                        onEntered: GlobalStates.osdVolumeOpen = false
+                        onEntered: osdTimeout.stop()
+                        onExited: osdTimeout.restart()
                     }
 
                     Column {
