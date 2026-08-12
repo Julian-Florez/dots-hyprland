@@ -7,10 +7,10 @@ import qs.modules.ii.onScreenDisplay
 OsdValueIndicator {
     id: root
     property var focusedScreen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name)
-    property var brightnessMonitor: Brightness.getMonitorForScreen(focusedScreen)
+    property var monitorRef: Brightness.getMonitorForScreen(focusedScreen)
 
     icon: {
-        var val = root.brightnessMonitor?.brightness ?? 0.5;
+        var val = root.monitorRef?.brightness ?? 0.5;
         if (val < 0.33) {
             return "brightness_low";
         } else if (val < 0.66) {
@@ -22,5 +22,7 @@ OsdValueIndicator {
     rotateIcon: false
     scaleIcon: false
     name: Translation.tr("Brightness")
-    value: root.brightnessMonitor?.brightness ?? 0.5
+    brightnessMonitor: root.monitorRef
+    value: root.monitorRef?.brightness ?? 0.5
+    showMixerButton: true
 }

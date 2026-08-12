@@ -16,10 +16,7 @@ Item {
     property real from: 0
     property real to: 1
     property bool showMixerButton: false
-
-    // Dynamic reference to focused screen's brightness monitor
-    property var focusedScreen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name)
-    property var brightnessMonitor: Brightness.getMonitorForScreen(focusedScreen)
+    property var brightnessMonitor: null // Passed from BrightnessIndicator child component
 
     // Derived property to check active state (e.g. not muted for volume)
     property bool isActive: {
@@ -160,26 +157,30 @@ Item {
                 }
             }
 
-            // Bottom Button (Sound Mixer)
+            // Bottom Button (Sound Mixer / Monitor Settings)
             Rectangle {
                 id: bottomButton
                 width: 40
                 height: 40
                 radius: 20
                 visible: root.showMixerButton
-                color: Appearance.m3colors.m3surfaceContainerLowest
+                color: "transparent" // Borderless/no background
 
                 MaterialSymbol {
                     anchors.centerIn: parent
                     color: Appearance.m3colors.m3primary
-                    text: "tune"
+                    text: root.name === Translation.tr("Volume") ? "tune" : "display_settings"
                     iconSize: 24
                 }
 
                 MouseArea {
                     anchors.fill: parent
                     onClicked: {
-                        Quickshell.execDetached(["bash", "-c", Config.options.apps.volumeMixer]);
+                        if (root.name === Translation.tr("Volume")) {
+                            Quickshell.execDetached(["bash", "-c", Config.options.apps.volumeMixer]);
+                        } else {
+                            Quickshell.execDetached(["hyprmod"]);
+                        }
                         GlobalStates.osdVolumeOpen = false;
                     }
                 }
