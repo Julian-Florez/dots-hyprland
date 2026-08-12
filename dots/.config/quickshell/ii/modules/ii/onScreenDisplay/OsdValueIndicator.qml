@@ -42,7 +42,7 @@ Item {
             fill: parent
             margins: Appearance.sizes.elevationMargin
         }
-        radius: width / 2
+        radius: 16 // Less rounded outer corners
         color: Appearance.m3colors.m3surfaceContainer // Dark brown background
 
         Column {
@@ -82,28 +82,9 @@ Item {
                 id: sliderTrack
                 width: 40
                 height: 180
-                radius: 20
+                radius: 12 // Less rounded slider track corners
                 color: Appearance.m3colors.m3surfaceContainerLowest
                 clip: true
-
-                // Horizontal Indicator Capsule (Thumb)
-                Rectangle {
-                    id: sliderThumb
-                    x: 4
-                    width: 32
-                    height: 6
-                    radius: 3
-                    color: Appearance.m3colors.m3primary
-                    y: Math.min(Math.max(parent.height * (1 - ((root.value - root.from) / (root.to - root.from))) - height / 2, 4), parent.height - height - 4)
-
-                    Behavior on y {
-                        enabled: !sliderMouseArea.pressed
-                        NumberAnimation {
-                            duration: 100
-                            easing.type: Easing.OutCubic
-                        }
-                    }
-                }
 
                 // Active Fill rounded rectangle
                 Rectangle {
@@ -116,18 +97,20 @@ Item {
                         bottom: parent.bottom
                         bottomMargin: 4
                     }
-                    // Height goes from bottom up to thumb bottom minus gap (4px)
-                    height: Math.max(0, (parent.height - 8) - sliderThumb.y - sliderThumb.height - 4)
-                    radius: width / 2
+                    height: (parent.height - 8) * Math.min(Math.max((root.value - root.from) / (root.to - root.from), 0), 1)
+                    radius: 8 // Less rounded fill corners
                     color: Appearance.m3colors.m3primary
+                }
 
-                    Behavior on height {
-                        enabled: !sliderMouseArea.pressed
-                        NumberAnimation {
-                            duration: 100
-                            easing.type: Easing.OutCubic
-                        }
-                    }
+                // Horizontal Indicator Capsule (Thumb)
+                Rectangle {
+                    id: sliderThumb
+                    x: 4
+                    width: 32
+                    height: 6
+                    radius: 3
+                    color: Appearance.m3colors.m3primary
+                    y: Math.max(4, parent.height - 4 - sliderFill.height - height - 4)
                 }
 
                 // Interactive MouseArea for dragging

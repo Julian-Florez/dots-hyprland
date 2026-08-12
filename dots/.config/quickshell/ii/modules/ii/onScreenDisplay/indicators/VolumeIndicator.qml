@@ -14,7 +14,7 @@ OsdValueIndicator {
         if (val <= 0) {
             return "volume_mute";
         } else if (val < 0.33) {
-            return "volume_mute"; // standard mute icon is good for zero/low
+            return "volume_mute";
         } else if (val < 0.66) {
             return "volume_down";
         } else {
