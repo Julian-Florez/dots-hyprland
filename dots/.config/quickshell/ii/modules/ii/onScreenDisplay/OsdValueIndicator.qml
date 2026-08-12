@@ -42,7 +42,7 @@ Item {
             fill: parent
             margins: Appearance.sizes.elevationMargin
         }
-        radius: 16 // Less rounded outer corners
+        radius: width / 2 // Fully rounded pill corners
         color: Appearance.m3colors.m3surfaceContainer // Dark brown background
 
         Column {
@@ -77,40 +77,78 @@ Item {
                 }
             }
 
-            // Middle Slider Track
-            Rectangle {
-                id: sliderTrack
+            // Middle Slider Container
+            Item {
+                id: sliderContainer
                 width: 40
                 height: 180
-                radius: 12 // Less rounded slider track corners
-                color: Appearance.m3colors.m3surfaceContainerLowest
-                clip: true
 
-                // Active Fill rounded rectangle
-                Rectangle {
-                    id: sliderFill
-                    anchors {
-                        left: parent.left
-                        leftMargin: 4
-                        right: parent.right
-                        rightMargin: 4
-                        bottom: parent.bottom
-                        bottomMargin: 4
+                // Vertical Track
+                Item {
+                    id: sliderTrack
+                    width: 4
+                    height: parent.height
+                    anchors.horizontalCenter: parent.horizontalCenter
+
+                    // Inactive track (top part)
+                    Rectangle {
+                        anchors {
+                            top: parent.top
+                            left: parent.left
+                            right: parent.right
+                        }
+                        height: parent.height * (1 - Math.min(Math.max((root.value - root.from) / (root.to - root.from), 0), 1))
+                        radius: 2
+                        color: Appearance.m3colors.m3surfaceContainerLowest
                     }
-                    height: (parent.height - 8) * Math.min(Math.max((root.value - root.from) / (root.to - root.from), 0), 1)
-                    radius: 8 // Less rounded fill corners
-                    color: Appearance.m3colors.m3primary
+
+                    // Active track fill (bottom part)
+                    Rectangle {
+                        anchors {
+                            bottom: parent.bottom
+                            left: parent.left
+                            right: parent.right
+                        }
+                        height: parent.height * Math.min(Math.max((root.value - root.from) / (root.to - root.from), 0), 1)
+                        radius: 2
+                        color: Appearance.m3colors.m3primary
+                    }
                 }
 
-                // Horizontal Indicator Capsule (Thumb)
+                // Handle (Circle with dynamic inner dot)
                 Rectangle {
-                    id: sliderThumb
-                    x: 4
-                    width: 32
-                    height: 6
-                    radius: 3
-                    color: Appearance.m3colors.m3primary
-                    y: Math.max(4, parent.height - 4 - sliderFill.height - height - 4)
+                    id: sliderHandle
+                    width: 20
+                    height: 20
+                    radius: 10
+                    color: Appearance.m3colors.m3onSurface
+                    anchors.horizontalCenter: parent.horizontalCenter
+
+                    property real ratio: Math.min(Math.max((root.value - root.from) / (root.to - root.from), 0), 1)
+                    y: (1 - ratio) * (parent.height - height)
+
+                    // Inner circle
+                    Rectangle {
+                        anchors.centerIn: parent
+                        width: sliderMouseArea.pressed ? 10 : handleMouseArea.containsMouse ? 14 : 12
+                        height: width
+                        radius: width / 2
+                        color: Appearance.m3colors.m3primary
+
+                        Behavior on width {
+                            NumberAnimation {
+                                duration: 100
+                                easing.type: Easing.OutCubic
+                            }
+                        }
+                    }
+
+                    MouseArea {
+                        id: handleMouseArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        acceptedButtons: Qt.NoButton
+                    }
                 }
 
                 // Interactive MouseArea for dragging
