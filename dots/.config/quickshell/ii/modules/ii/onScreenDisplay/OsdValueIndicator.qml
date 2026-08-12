@@ -42,7 +42,7 @@ Item {
             fill: parent
             margins: Appearance.sizes.elevationMargin
         }
-        radius: width / 2 // Fully rounded pill corners
+        radius: width / 2 // Fully rounded pill corners for the outer OSD background
         color: Appearance.m3colors.m3surfaceContainer // Dark brown background
 
         Column {
@@ -77,30 +77,21 @@ Item {
                 }
             }
 
-            // Middle Slider Container
+            // Middle Slider Container (matching Waffle QuickSlider width)
             Item {
                 id: sliderContainer
                 width: 40
                 height: 180
 
-                // Vertical Track
-                Item {
+                // 30px-wide Track (matching StyledSlider.Configuration.M)
+                Rectangle {
                     id: sliderTrack
-                    width: 4
+                    width: 30
                     height: parent.height
+                    radius: 9 // Not a pill, but a rounded rectangle with 9px radius
+                    color: Appearance.m3colors.m3surfaceContainerLowest
                     anchors.horizontalCenter: parent.horizontalCenter
-
-                    // Inactive track (top part)
-                    Rectangle {
-                        anchors {
-                            top: parent.top
-                            left: parent.left
-                            right: parent.right
-                        }
-                        height: parent.height * (1 - Math.min(Math.max((root.value - root.from) / (root.to - root.from), 0), 1))
-                        radius: 2
-                        color: Appearance.m3colors.m3surfaceContainerLowest
-                    }
+                    clip: true
 
                     // Active track fill (bottom part)
                     Rectangle {
@@ -110,45 +101,22 @@ Item {
                             right: parent.right
                         }
                         height: parent.height * Math.min(Math.max((root.value - root.from) / (root.to - root.from), 0), 1)
-                        radius: 2
+                        radius: 9
                         color: Appearance.m3colors.m3primary
                     }
                 }
 
-                // Handle (Circle with dynamic inner dot)
+                // Handle (horizontal bar: 39px wide, 3px high)
                 Rectangle {
                     id: sliderHandle
-                    width: 20
-                    height: 20
-                    radius: 10
-                    color: Appearance.m3colors.m3onSurface
+                    width: 39
+                    height: sliderMouseArea.pressed ? 1.5 : 3
+                    radius: 1.5
+                    color: Appearance.m3colors.m3primary
                     anchors.horizontalCenter: parent.horizontalCenter
 
                     property real ratio: Math.min(Math.max((root.value - root.from) / (root.to - root.from), 0), 1)
-                    y: (1 - ratio) * (parent.height - height)
-
-                    // Inner circle
-                    Rectangle {
-                        anchors.centerIn: parent
-                        width: sliderMouseArea.pressed ? 10 : handleMouseArea.containsMouse ? 14 : 12
-                        height: width
-                        radius: width / 2
-                        color: Appearance.m3colors.m3primary
-
-                        Behavior on width {
-                            NumberAnimation {
-                                duration: 100
-                                easing.type: Easing.OutCubic
-                            }
-                        }
-                    }
-
-                    MouseArea {
-                        id: handleMouseArea
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        acceptedButtons: Qt.NoButton
-                    }
+                    y: (1 - ratio) * parent.height - height / 2
                 }
 
                 // Interactive MouseArea for dragging
