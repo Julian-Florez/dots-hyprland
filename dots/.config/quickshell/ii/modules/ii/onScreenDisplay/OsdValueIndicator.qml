@@ -89,7 +89,7 @@ Item {
                     width: 30
                     height: parent.height
                     radius: 9 // Not a pill, but a rounded rectangle with 9px radius
-                    color: Appearance.m3colors.m3surfaceContainerLowest
+                    color: Appearance.colors.colSecondaryContainer
                     anchors.horizontalCenter: parent.horizontalCenter
                     clip: true
 
@@ -102,21 +102,29 @@ Item {
                         }
                         height: parent.height * Math.min(Math.max((root.value - root.from) / (root.to - root.from), 0), 1)
                         radius: 9
-                        color: Appearance.m3colors.m3primary
+                        color: root.isActive ? Appearance.m3colors.m3primary : Appearance.colors.colSecondaryContainer
                     }
                 }
 
-                // Handle (horizontal bar: 39px wide, 3px high)
+                // Handle (horizontal bar: 39px wide, 3px high with a background color mask for a floating effect)
                 Rectangle {
                     id: sliderHandle
-                    width: 39
-                    height: sliderMouseArea.pressed ? 1.5 : 3
-                    radius: 1.5
-                    color: Appearance.m3colors.m3primary
+                    width: 40
+                    height: (sliderMouseArea.pressed ? 1.5 : 3) + 4 // Handle thickness + 4px for gap
+                    color: Appearance.m3colors.m3surfaceContainer // Same color as main background to mask track and look floating
                     anchors.horizontalCenter: parent.horizontalCenter
 
                     property real ratio: Math.min(Math.max((root.value - root.from) / (root.to - root.from), 0), 1)
                     y: (1 - ratio) * parent.height - height / 2
+
+                    // Actual orange handle line inside the mask
+                    Rectangle {
+                        anchors.centerIn: parent
+                        width: 39
+                        height: sliderMouseArea.pressed ? 1.5 : 3
+                        radius: 1.5
+                        color: root.isActive ? Appearance.m3colors.m3primary : Appearance.m3colors.m3onSurface
+                    }
                 }
 
                 // Interactive MouseArea for dragging
