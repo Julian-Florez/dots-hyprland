@@ -62,7 +62,7 @@ Item {
                     anchors.centerIn: parent
                     color: root.isActive ? Appearance.m3colors.m3onPrimary : Appearance.m3colors.m3primary
                     text: root.icon
-                    iconSize: 20
+                    iconSize: 24
                 }
 
                 MouseArea {
@@ -86,16 +86,48 @@ Item {
                 color: Appearance.m3colors.m3surfaceContainerLowest
                 clip: true
 
-                // Active Fill
+                // Horizontal Indicator Capsule (Thumb)
+                Rectangle {
+                    id: sliderThumb
+                    x: 4
+                    width: 32
+                    height: 6
+                    radius: 3
+                    color: Appearance.m3colors.m3primary
+                    y: Math.min(Math.max(parent.height * (1 - ((root.value - root.from) / (root.to - root.from))) - height / 2, 4), parent.height - height - 4)
+
+                    Behavior on y {
+                        enabled: !sliderMouseArea.pressed
+                        NumberAnimation {
+                            duration: 100
+                            easing.type: Easing.OutCubic
+                        }
+                    }
+                }
+
+                // Active Fill rounded rectangle
                 Rectangle {
                     id: sliderFill
                     anchors {
                         left: parent.left
+                        leftMargin: 4
                         right: parent.right
+                        rightMargin: 4
                         bottom: parent.bottom
+                        bottomMargin: 4
                     }
-                    height: parent.height * Math.min(Math.max((root.value - root.from) / (root.to - root.from), 0), 1)
+                    // Height goes from bottom up to thumb bottom minus gap (4px)
+                    height: Math.max(0, (parent.height - 8) - sliderThumb.y - sliderThumb.height - 4)
+                    radius: width / 2
                     color: Appearance.m3colors.m3primary
+
+                    Behavior on height {
+                        enabled: !sliderMouseArea.pressed
+                        NumberAnimation {
+                            duration: 100
+                            easing.type: Easing.OutCubic
+                        }
+                    }
                 }
 
                 // Interactive MouseArea for dragging
@@ -144,7 +176,7 @@ Item {
                     anchors.centerIn: parent
                     color: Appearance.m3colors.m3primary
                     text: "tune"
-                    iconSize: 20
+                    iconSize: 24
                 }
 
                 MouseArea {
