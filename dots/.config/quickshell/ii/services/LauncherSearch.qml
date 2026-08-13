@@ -13,9 +13,87 @@ Singleton {
     id: root
 
     property string query: ""
+    property list<string> fileResults: []
+
+    Timer {
+        id: fileSearchTimer
+        interval: 150
+        repeat: false
+        onTriggered: {
+            let searchString = root.query.trim();
+            if (searchString.startsWith(Config.options.search.prefix.fileSearch)) {
+                searchString = StringUtils.cleanPrefix(searchString, Config.options.search.prefix.fileSearch).trim();
+            }
+            if (searchString.length >= 3) {
+                fileSearchProc.search(searchString);
+            } else {
+                root.fileResults = [];
+            }
+        }
+    }
+
+    Process {
+        id: fileSearchProc
+        property list<string> resultsBuffer: []
+
+        function search(searchString) {
+            fileSearchProc.running = false;
+            fileSearchProc.resultsBuffer = [];
+            
+            const terms = searchString.split(/\s+/).filter(t => t.length > 0);
+            if (terms.length === 0) {
+                root.fileResults = [];
+                return;
+            }
+            
+            const escapedTerms = terms.map(term => "-iwholename '*" + StringUtils.shellSingleQuoteEscape(term) + "*'").join(" ");
+            
+            fileSearchProc.command = [
+                "bash",
+                "-c",
+                "find /home/julian \\( -name '.*' -o -name 'Android' -o -name 'Dispositivos' -o -name 'GoogleDrive' -o -name 'node_modules' -o -name 'build' -o -name 'out' -o -name 'dist' -o -name 'target' -o -name 'venv' \\) -prune -o " + escapedTerms + " -printf '%y:%p\\n' 2>/dev/null | awk -F/ '{print NF, $0}' | sort -n | cut -d' ' -f2- | head -n 15"
+            ];
+            fileSearchProc.running = true;
+        }
+
+        stdout: SplitParser {
+            onRead: line => {
+                fileSearchProc.resultsBuffer.push(line);
+            }
+        }
+
+        onExited: (exitCode, exitStatus) => {
+            if (exitCode === 0) {
+                root.fileResults = fileSearchProc.resultsBuffer;
+            }
+        }
+    }
+
+    onQueryChanged: {
+        const cleaned = query.trim();
+        if (query.startsWith(Config.options.search.prefix.clipboard) || query.startsWith(Config.options.search.prefix.emojis)) {
+            fileSearchTimer.stop();
+            fileSearchProc.running = false;
+            root.fileResults = [];
+            return;
+        }
+
+        let checkString = cleaned;
+        if (checkString.startsWith(Config.options.search.prefix.fileSearch)) {
+            checkString = StringUtils.cleanPrefix(checkString, Config.options.search.prefix.fileSearch).trim();
+        }
+
+        if (checkString.length >= 3) {
+            fileSearchTimer.restart();
+        } else {
+            fileSearchTimer.stop();
+            fileSearchProc.running = false;
+            root.fileResults = [];
+        }
+    }
 
     function ensurePrefix(prefix) {
-        if ([Config.options.search.prefix.action, Config.options.search.prefix.app, Config.options.search.prefix.clipboard, Config.options.search.prefix.emojis, Config.options.search.prefix.math, Config.options.search.prefix.shellCommand, Config.options.search.prefix.webSearch,].some(i => root.query.startsWith(i))) {
+        if ([Config.options.search.prefix.action, Config.options.search.prefix.app, Config.options.search.prefix.clipboard, Config.options.search.prefix.emojis, Config.options.search.prefix.math, Config.options.search.prefix.shellCommand, Config.options.search.prefix.webSearch, Config.options.search.prefix.fileSearch,].some(i => root.query.startsWith(i))) {
             root.query = prefix + root.query.slice(1);
         } else {
             root.query = prefix + root.query;
@@ -294,17 +372,14 @@ Singleton {
             }
         });
         const webSearchResultObject = resultComp.createObject(null, {
-            name: StringUtils.cleanPrefix(root.query, Config.options.search.prefix.webSearch),
+            name: root.query.startsWith("g ") ? root.query.slice(2) : (root.query.startsWith("google ") ? root.query.slice(7) : StringUtils.cleanPrefix(root.query, Config.options.search.prefix.webSearch)),
             verb: Translation.tr("Search"),
-            type: Translation.tr("Web search"),
-            iconName: 'travel_explore',
-            iconType: LauncherSearchResult.IconType.Material,
+            type: Translation.tr("Google search"),
+            iconName: 'google-chrome',
+            iconType: LauncherSearchResult.IconType.System,
             execute: () => {
-                let query = StringUtils.cleanPrefix(root.query, Config.options.search.prefix.webSearch);
+                let query = root.query.startsWith("g ") ? root.query.slice(2) : (root.query.startsWith("google ") ? root.query.slice(7) : StringUtils.cleanPrefix(root.query, Config.options.search.prefix.webSearch));
                 let url = Config.options.search.engineBaseUrl + query;
-                for (let site of Config.options.search.excludedSites) {
-                    url += ` -site:${site}`;
-                }
                 Qt.openUrlExternally(url);
             }
         });
@@ -327,10 +402,47 @@ Singleton {
 
         //////// Prioritized by prefix /////////
         let result = [];
+        const startsWithFileSearchPrefix = root.query.startsWith(Config.options.search.prefix.fileSearch);
+
+        if (startsWithFileSearchPrefix) {
+            if (root.fileResults.length > 0) {
+                const fileResultObjects = root.fileResults.map(entry => {
+                    const parts = entry.split(":");
+                    if (parts.length < 2) return null;
+                    const isDir = parts[0] === "d";
+                    const filePath = parts.slice(1).join(":");
+                    return resultComp.createObject(null, {
+                        name: FileUtils.fileNameForPath(filePath),
+                        comment: filePath,
+                        verb: isDir ? Translation.tr("Open Folder") : Translation.tr("Open File"),
+                        type: isDir ? Translation.tr("Folder") : Translation.tr("File"),
+                        iconName: isDir ? 'folder' : 'description',
+                        iconType: LauncherSearchResult.IconType.Material,
+                        execute: () => {
+                            Qt.openUrlExternally("file://" + filePath);
+                        },
+                        actions: [
+                            resultComp.createObject(null, {
+                                name: Translation.tr("Copy path"),
+                                iconName: "content_copy",
+                                iconType: LauncherSearchResult.IconType.Material,
+                                execute: () => {
+                                    Quickshell.clipboardText = filePath;
+                                }
+                            })
+                        ]
+                    });
+                }).filter(Boolean);
+                result = result.concat(fileResultObjects);
+            }
+            return result;
+        }
+
         const startsWithNumber = /^\d/.test(root.query);
         const startsWithMathPrefix = root.query.startsWith(Config.options.search.prefix.math);
         const startsWithShellCommandPrefix = root.query.startsWith(Config.options.search.prefix.shellCommand);
-        const startsWithWebSearchPrefix = root.query.startsWith(Config.options.search.prefix.webSearch);
+        const startsWithWebSearchPrefix = root.query.startsWith(Config.options.search.prefix.webSearch) || root.query.startsWith("g ") || root.query.startsWith("google ");
+
         if (startsWithNumber || startsWithMathPrefix) {
             result.push(mathResultObject);
         } else if (startsWithShellCommandPrefix) {
@@ -340,7 +452,39 @@ Singleton {
         }
 
         //////////////// Apps //////////////////
-        result = result.concat(appResultObjects);
+        result = result.concat(appResultObjects.slice(0, 8));
+
+        //////////////// Files and Folders //////////////////
+        if (root.fileResults.length > 0) {
+            const fileResultObjects = root.fileResults.map(entry => {
+                const parts = entry.split(":");
+                if (parts.length < 2) return null;
+                const isDir = parts[0] === "d";
+                const filePath = parts.slice(1).join(":");
+                return resultComp.createObject(null, {
+                    name: FileUtils.fileNameForPath(filePath),
+                    comment: filePath,
+                    verb: isDir ? Translation.tr("Open Folder") : Translation.tr("Open File"),
+                    type: isDir ? Translation.tr("Folder") : Translation.tr("File"),
+                    iconName: isDir ? 'folder' : 'description',
+                    iconType: LauncherSearchResult.IconType.Material,
+                    execute: () => {
+                        Qt.openUrlExternally("file://" + filePath);
+                    },
+                    actions: [
+                        resultComp.createObject(null, {
+                            name: Translation.tr("Copy path"),
+                            iconName: "content_copy",
+                            iconType: LauncherSearchResult.IconType.Material,
+                            execute: () => {
+                                Quickshell.clipboardText = filePath;
+                            }
+                        })
+                    ]
+                });
+            }).filter(Boolean);
+            result = result.concat(fileResultObjects);
+        }
 
         ////////// Launcher actions ////////////
         result = result.concat(launcherActionObjects);

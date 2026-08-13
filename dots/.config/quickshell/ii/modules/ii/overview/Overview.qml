@@ -123,6 +123,26 @@ Scope {
         GlobalStates.overviewOpen = true;
     }
 
+    function toggleWebSearch() {
+        if (GlobalStates.overviewOpen && overviewScope.dontAutoCancelSearch) {
+            GlobalStates.overviewOpen = false;
+            return;
+        }
+        overviewScope.dontAutoCancelSearch = true;
+        panelWindow.setSearchingText(Config.options.search.prefix.webSearch);
+        GlobalStates.overviewOpen = true;
+    }
+
+    function toggleFileSearch() {
+        if (GlobalStates.overviewOpen && overviewScope.dontAutoCancelSearch) {
+            GlobalStates.overviewOpen = false;
+            return;
+        }
+        overviewScope.dontAutoCancelSearch = true;
+        panelWindow.setSearchingText(Config.options.search.prefix.fileSearch);
+        GlobalStates.overviewOpen = true;
+    }
+
     IpcHandler {
         target: "search"
 
@@ -209,6 +229,24 @@ Scope {
 
         onPressed: {
             overviewScope.toggleEmojis();
+        }
+    }
+
+    GlobalShortcut {
+        name: "overviewWebSearchToggle"
+        description: "Toggle web search query on overview widget"
+
+        onPressed: {
+            overviewScope.toggleWebSearch();
+        }
+    }
+
+    GlobalShortcut {
+        name: "overviewFileSearchToggle"
+        description: "Toggle file search query on overview widget"
+
+        onPressed: {
+            overviewScope.toggleFileSearch();
         }
     }
 }

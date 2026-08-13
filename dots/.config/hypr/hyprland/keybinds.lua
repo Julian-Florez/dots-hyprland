@@ -23,6 +23,8 @@ hl.bind("SUPER_R", hl.dsp.global("quickshell:workspaceNumber"),
 hl.bind("SUPER + Tab", hl.dsp.global("quickshell:overviewWorkspacesToggle"), { description = "Shell: Toggle overview" })
 hl.bind("SUPER + V", hl.dsp.global("quickshell:overviewClipboardToggle"))
 hl.bind("SUPER + Period", hl.dsp.global("quickshell:overviewEmojiToggle"))
+hl.bind("SUPER + SHIFT + G", hl.dsp.global("quickshell:overviewWebSearchToggle"), { description = "Shell: Google Search" })
+hl.bind("SUPER + SHIFT + F", hl.dsp.global("quickshell:overviewFileSearchToggle"), { description = "Shell: File Search" })
 hl.bind("SUPER + A", hl.dsp.global("quickshell:sidebarLeftToggle"), { description = "Shell: Toggle left sidebar" })
 hl.bind("SUPER + ALT + A", hl.dsp.global("quickshell:sidebarLeftToggleDetach"))
 hl.bind("SUPER + B", hl.dsp.global("quickshell:sidebarLeftToggle"))
