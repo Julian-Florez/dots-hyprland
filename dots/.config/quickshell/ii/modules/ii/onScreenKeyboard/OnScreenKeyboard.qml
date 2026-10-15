@@ -35,6 +35,7 @@ Scope { // Scope
         sourceComponent: PanelWindow { // Window
             id: oskRoot
             visible: oskLoader.active && !GlobalStates.screenLocked
+            screen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name) ?? null
 
             anchors {
                 bottom: true
